@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>塔罗占卜 - 首页</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0A0118;
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 70px;
+      overflow-x: hidden;
+    }
+
+    /* 神秘背景效果 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(148, 0, 211, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(75, 0, 130, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 星空背景 */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(186, 85, 211, 0.4), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(138, 43, 226, 0.3), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(147, 112, 219, 0.5), transparent),
+        radial-gradient(1px 1px at 80% 10%, rgba(186, 85, 211, 0.4), transparent),
+        radial-gradient(2px 2px at 90% 60%, rgba(138, 43, 226, 0.3), transparent),
+        radial-gradient(1px 1px at 33% 80%, rgba(147, 112, 219, 0.4), transparent);
+      background-size: 200% 200%;
+      background-position: 0% 0%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 头部区域 */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: linear-gradient(180deg, rgba(30, 10, 60, 0.95) 0%, rgba(20, 5, 40, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(186, 85, 211, 0.2);
+      box-shadow: 0 4px 24px rgba(138, 43, 226, 0.1);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 16px rgba(157, 78, 221, 0.4);
+      border: 2px solid rgba(186, 85, 211, 0.3);
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E0AAFF 0%, #C77DFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.5px;
+    }
+
+    .settings-icon {
+      width: 28px;
+      height: 28px;
+      color: #C77DFF;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 8px rgba(199, 125, 255, 0.3));
+    }
+
+    .settings-icon:hover {
+      color: #E0AAFF;
+      transform: rotate(30deg);
+    }
+
+    /* 主内容区 */
+    .container {
+      padding: 24px;
+    }
+
+    /* 每日一抽大卡片 */
+    .daily-card {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.2) 0%, rgba(88, 28, 135, 0.15) 100%);
+      border-radius: 24px;
+      padding: 32px 24px;
+      text-align: center;
+      margin-bottom: 32px;
+      box-shadow:
+        0 8px 32px rgba(138, 43, 226, 0.2),
+        inset 0 1px 0 rgba(224, 170, 255, 0.1);
+      border: 1.5px solid rgba(186, 85, 211, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .daily-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(224, 170, 255, 0.08), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .daily-card:hover::before {
+      left: 100%;
+    }
+
+    .daily-card-image {
+      width: 180px;
+      height: 260px;
+      margin: 0 auto 24px;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 50%, #5A189A 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      box-shadow:
+        0 12px 40px rgba(157, 78, 221, 0.4),
+        0 0 60px rgba(138, 43, 226, 0.2),
+        inset 0 2px 0 rgba(224, 170, 255, 0.2);
+      border: 2px solid rgba(224, 170, 255, 0.3);
+      position: relative;
+    }
+
+    .daily-card-image::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(224, 170, 255, 0.1), transparent);
+      transform: rotate(45deg);
+    }
+
+    .daily-card-title {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E0AAFF 0%, #C77DFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 12px rgba(224, 170, 255, 0.3);
+    }
+
+    .daily-card-subtitle {
+      font-size: 15px;
+      color: #D8B4FE;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    /* 快速占卜区域 */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      background: linear-gradient(135deg, #E0AAFF 0%, #C77DFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      padding-left: 14px;
+    }
+
+    .section-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(180deg, #9D4EDD 0%, #7B2CBF 100%);
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(157, 78, 221, 0.6);
+    }
+
+    .quick-divination {
+      margin-bottom: 32px;
+    }
+
+    .divination-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .divination-item {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 16px;
+      padding: 24px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .divination-item::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(157, 78, 221, 0.2) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: width 0.5s ease, height 0.5s ease;
+    }
+
+    .divination-item:hover::before {
+      width: 200%;
+      height: 200%;
+    }
+
+    .divination-item:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: #9D4EDD;
+      box-shadow:
+        0 12px 32px rgba(157, 78, 221, 0.3),
+        0 0 40px rgba(138, 43, 226, 0.2);
+    }
+
+    .divination-icon {
+      font-size: 38px;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 2px 8px rgba(157, 78, 221, 0.3));
+    }
+
+    .divination-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #E0AAFF;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 精选内容区域 */
+    .featured-section {
+      margin-bottom: 32px;
+    }
+
+    .featured-scroll {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      overflow-y: visible;
+      padding: 8px 0 12px 0;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(157, 78, 221, 0.3) transparent;
+    }
+
+    .featured-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .featured-scroll::-webkit-scrollbar-track {
+      background: rgba(123, 44, 191, 0.1);
+      border-radius: 3px;
+    }
+
+    .featured-scroll::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, #9D4EDD 0%, #7B2CBF 100%);
+      border-radius: 3px;
+    }
+
+    .featured-item {
+      min-width: 150px;
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(224, 170, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .featured-item:hover::before {
+      left: 100%;
+    }
+
+    .featured-item:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: #9D4EDD;
+      box-shadow:
+        0 16px 40px rgba(157, 78, 221, 0.4),
+        0 0 50px rgba(138, 43, 226, 0.2);
+      z-index: 10;
+    }
+
+    .featured-icon {
+      font-size: 42px;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 4px 12px rgba(157, 78, 221, 0.4));
+    }
+
+    .featured-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #E0AAFF;
+      margin-bottom: 6px;
+    }
+
+    .featured-subtitle {
+      font-size: 13px;
+      color: #C77DFF;
+      opacity: 0.8;
+    }
+
+    /* 底部导航栏 */
+    .tabbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      background: linear-gradient(180deg, rgba(20, 5, 40, 0.95) 0%, rgba(15, 3, 30, 0.98) 100%);
+      backdrop-filter: blur(20px);
+      border-top: 1.5px solid rgba(186, 85, 211, 0.2);
+      height: 70px;
+      padding: 0;
+      box-shadow: 0 -4px 24px rgba(138, 43, 226, 0.15);
+      z-index: 100;
+    }
+
+    .tabbar-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      color: #9D9DB8;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tabbar-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #9D4EDD 0%, #C77DFF 100%);
+      border-radius: 0 0 3px 3px;
+      transition: width 0.3s ease;
+      box-shadow: 0 2px 12px rgba(157, 78, 221, 0.6);
+    }
+
+    .tabbar-item.active::before {
+      width: 60%;
+    }
+
+    .tabbar-item.active {
+      color: #E0AAFF;
+    }
+
+    .tabbar-item:hover {
+      color: #C77DFF;
+    }
+
+    .tabbar-icon {
+      font-size: 26px;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 8px rgba(157, 78, 221, 0.2));
+    }
+
+    .tabbar-item.active .tabbar-icon {
+      transform: scale(1.1);
+      filter: drop-shadow(0 4px 12px rgba(157, 78, 221, 0.5));
+    }
+
+    .tabbar-text {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    /* 装饰性元素 */
+    .mystical-glow {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(157, 78, 221, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(40px);
+    }
+
+    .glow-1 {
+      top: 10%;
+      left: -10%;
+    }
+
+    .glow-2 {
+      bottom: 20%;
+      right: -10%;
+    }
+  </style>
+</head>
+<body>
+  <!-- 装饰性光效 -->
+  <div class="mystical-glow glow-1"></div>
+  <div class="mystical-glow glow-2"></div>
+
+  <div class="app-container">
+    <!-- 头部 -->
+    <div class="header">
+      <div class="header-left">
+        <div class="avatar">🔮</div>
+        <div class="title">塔罗占卜</div>
+      </div>
+      <div class="settings-icon">⚙️</div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+      <!-- 每日一抽大卡片 -->
+      <div class="daily-card">
+        <div class="daily-card-image">🃏</div>
+        <div class="daily-card-title">今日运势: 愚者</div>
+        <div class="daily-card-subtitle">新的开始,充满无限可能</div>
+      </div>
+
+      <!-- 快速占卜 -->
+      <div class="quick-divination">
+        <div class="section-title">快速占卜</div>
+        <div class="divination-grid">
+          <div class="divination-item">
+            <div class="divination-icon">💖</div>
+            <div class="divination-text">爱情</div>
+          </div>
+          <div class="divination-item">
+            <div class="divination-icon">💼</div>
+            <div class="divination-text">事业</div>
+          </div>
+          <div class="divination-item">
+            <div class="divination-icon">📚</div>
+            <div class="divination-text">学业</div>
+          </div>
+          <div class="divination-item">
+            <div class="divination-icon">💰</div>
+            <div class="divination-text">财运</div>
+          </div>
+          <div class="divination-item">
+            <div class="divination-icon">🏥</div>
+            <div class="divination-text">健康</div>
+          </div>
+          <div class="divination-item">
+            <div class="divination-icon">✨</div>
+            <div class="divination-text">通用</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 精选内容 -->
+      <div class="featured-section">
+        <div class="section-title">精选内容</div>
+        <div class="featured-scroll">
+          <div class="featured-item">
+            <div class="featured-icon">📖</div>
+            <div class="featured-title">塔罗</div>
+            <div class="featured-subtitle">知识</div>
+          </div>
+          <div class="featured-item">
+            <div class="featured-icon">⭐</div>
+            <div class="featured-title">星座</div>
+            <div class="featured-subtitle">运势</div>
+          </div>
+          <div class="featured-item">
+            <div class="featured-icon">🎴</div>
+            <div class="featured-title">牌阵</div>
+            <div class="featured-subtitle">推荐</div>
+          </div>
+          <div class="featured-item">
+            <div class="featured-icon">🌙</div>
+            <div class="featured-title">月相</div>
+            <div class="featured-subtitle">占卜</div>
+          </div>
+          <div class="featured-item">
+            <div class="featured-icon">🌟</div>
+            <div class="featured-title">冥想</div>
+            <div class="featured-subtitle">引导</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="tabbar">
+      <div class="tabbar-item active">
+        <div class="tabbar-icon">🏠</div>
+        <div class="tabbar-text">首页</div>
+      </div>
+      <div class="tabbar-item">
+        <div class="tabbar-icon">🎴</div>
+        <div class="tabbar-text">牌库</div>
+      </div>
+      <div class="tabbar-item">
+        <div class="tabbar-icon">📜</div>
+        <div class="tabbar-text">历史</div>
+      </div>
+      <div class="tabbar-item">
+        <div class="tabbar-icon">📚</div>
+        <div class="tabbar-text">学习</div>
+      </div>
+      <div class="tabbar-item">
+        <div class="tabbar-icon">👤</div>
+        <div class="tabbar-text">我的</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
