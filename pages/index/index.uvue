@@ -1,24 +1,21 @@
 <template>
 	<view>
-		<image class="logo" src="/static/logo.png"></image>
-		<text class="title">{{title}}</text>
+		<image class="logo" src="/static/logo.png">
+		</image>
+		<text class="title">
+			{{title}}
+		</text>
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				title: 'Hello'
-			}
-		},
-		onLoad() {
+<script setup lang="uts">
+	import { ref } from 'vue';
 
-		},
-		methods: {
+	const title = ref('Hello');
 
-		}
-	}
+	onLoad(() => {
+
+		});
 </script>
 
 <style>
@@ -31,6 +28,6 @@
 	.title {
 		font-size: 18px;
 		color: #8f8f94;
-    text-align: center;
+		text-align: center;
 	}
 </style>
