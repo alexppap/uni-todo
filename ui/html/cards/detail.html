@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>愚者 - 塔罗牌库</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0A0118;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 神秘背景效果 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(148, 0, 211, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(75, 0, 130, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 星空背景 */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(186, 85, 211, 0.4), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(138, 43, 226, 0.3), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(147, 112, 219, 0.5), transparent);
+      background-size: 200% 200%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 导航栏 */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: linear-gradient(180deg, rgba(30, 10, 60, 0.95) 0%, rgba(20, 5, 40, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(186, 85, 211, 0.2);
+      box-shadow: 0 4px 24px rgba(138, 43, 226, 0.1);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-button {
+      color: #E0AAFF;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      color: #C77DFF;
+      transform: translateX(-4px);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #E0AAFF;
+    }
+
+    .favorite-button {
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #C77DFF;
+    }
+
+    .favorite-button:hover {
+      transform: scale(1.1);
+    }
+
+    .favorite-button.active {
+      color: #FF6B9D;
+    }
+
+    /* 主内容 */
+    .container {
+      padding: 32px 24px;
+    }
+
+    /* 卡牌大图 */
+    .card-image-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+
+    .card-large {
+      width: 260px;
+      height: 390px;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 50%, #5A189A 100%);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 120px;
+      box-shadow:
+        0 20px 60px rgba(157, 78, 221, 0.6),
+        0 0 100px rgba(138, 43, 226, 0.3),
+        inset 0 2px 0 rgba(224, 170, 255, 0.2);
+      border: 3px solid rgba(224, 170, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-large::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(224, 170, 255, 0.15), transparent);
+      transform: rotate(45deg);
+    }
+
+    /* 基本信息 */
+    .basic-info {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 32px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 16px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      flex-wrap: wrap;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-label {
+      font-size: 13px;
+      color: #9D9DB8;
+    }
+
+    .info-value {
+      font-size: 15px;
+      color: #E0AAFF;
+      font-weight: 600;
+    }
+
+    /* 关键词 */
+    .keywords-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E0AAFF 0%, #C77DFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      position: relative;
+      padding-left: 14px;
+    }
+
+    .section-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(180deg, #9D4EDD 0%, #7B2CBF 100%);
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(157, 78, 221, 0.6);
+    }
+
+    .keywords-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .keyword-tag {
+      padding: 8px 16px;
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.2) 0%, rgba(123, 44, 191, 0.15) 100%);
+      border-radius: 20px;
+      font-size: 14px;
+      color: #C77DFF;
+      border: 1.5px solid rgba(186, 85, 211, 0.3);
+      font-weight: 500;
+    }
+
+    /* 含义切换 */
+    .meaning-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 12px 24px;
+      background: transparent;
+      border: 1.5px solid rgba(186, 85, 211, 0.3);
+      border-radius: 12px;
+      color: #C77DFF;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .tab-button:hover {
+      border-color: #9D4EDD;
+      background: rgba(157, 78, 221, 0.1);
+    }
+
+    .tab-button.active {
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 100%);
+      border-color: #9D4EDD;
+      color: #FFFFFF;
+      box-shadow: 0 4px 16px rgba(157, 78, 221, 0.4);
+    }
+
+    /* 含义内容 */
+    .meaning-content {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      margin-bottom: 24px;
+    }
+
+    .meaning-text {
+      font-size: 15px;
+      color: #D8B4FE;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .subsection-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #E0AAFF;
+      margin-bottom: 12px;
+      margin-top: 16px;
+    }
+
+    .symbol-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .symbol-list li {
+      font-size: 14px;
+      color: #D8B4FE;
+      line-height: 1.8;
+      padding-left: 24px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .symbol-list li::before {
+      content: '•';
+      position: absolute;
+      left: 8px;
+      color: #9D4EDD;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    /* 背景故事 */
+    .story-section {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      margin-bottom: 32px;
+    }
+
+    .story-text {
+      font-size: 15px;
+      color: #D8B4FE;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 导航栏 -->
+    <div class="navbar">
+      <div class="nav-left">
+        <span class="back-button">←</span>
+        <span class="card-title">愚者 (The Fool)</span>
+      </div>
+      <div class="favorite-button">♡</div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+      <!-- 卡牌大图 -->
+      <div class="card-image-section">
+        <div class="card-large">🃏</div>
+      </div>
+
+      <!-- 基本信息 -->
+      <div class="basic-info">
+        <div class="info-item">
+          <div class="info-label">编号</div>
+          <div class="info-value">0</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">类别</div>
+          <div class="info-value">大阿卡纳</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">元素</div>
+          <div class="info-value">风</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">星座</div>
+          <div class="info-value">天王星</div>
+        </div>
+      </div>
+
+      <!-- 关键词 -->
+      <div class="keywords-section">
+        <div class="section-title">关键词</div>
+        <div class="keywords-list">
+          <span class="keyword-tag">#新开始</span>
+          <span class="keyword-tag">#冒险</span>
+          <span class="keyword-tag">#纯真</span>
+          <span class="keyword-tag">#自由</span>
+          <span class="keyword-tag">#天真</span>
+          <span class="keyword-tag">#无限可能</span>
+        </div>
+      </div>
+
+      <!-- 含义切换 -->
+      <div class="section-title">牌义解读</div>
+      <div class="meaning-tabs">
+        <button class="tab-button active">正位含义</button>
+        <button class="tab-button">逆位含义</button>
+      </div>
+
+      <!-- 正位含义 -->
+      <div class="meaning-content">
+        <div class="meaning-text">
+          愚者代表新的开始、冒险精神和无限可能。他鼓励你跟随内心，勇敢迈出第一步。愚者象征着纯真、自发性和对未知的信任。这张牌提醒你保持开放的心态，相信生命的旅程会带给你意想不到的惊喜。
+        </div>
+
+        <div class="subsection-title">象征意义</div>
+        <ul class="symbol-list">
+          <li>白玫瑰：纯洁与新开始</li>
+          <li>小狗：忠诚的伙伴和本能</li>
+          <li>悬崖：未知的冒险和信念的跳跃</li>
+          <li>行囊：轻装上阵，不为过去所累</li>
+          <li>太阳：光明的前景和希望</li>
+        </ul>
+
+        <div class="subsection-title">应用领域</div>
+        <div class="meaning-text">
+          在爱情中代表新恋情的开始；在事业上意味着新项目或转职的机会；在个人成长方面表示跳出舒适圈的时刻。
+        </div>
+      </div>
+
+      <!-- 背景故事 -->
+      <div class="story-section">
+        <div class="section-title">背景故事</div>
+        <div class="story-text">
+          愚者是塔罗牌旅程的开始，他代表着每个人生命旅程的起点。作为编号0的牌，他既是开始也是结束，象征着无限的循环。愚者教导我们，有时候我们需要忘记所有的规则和经验，像个孩子一样用全新的眼光看待世界。他的旅程充满了未知，但正是这份未知让生命充满了无限的可能性。
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
