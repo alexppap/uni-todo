@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>占卜详情 - 塔罗占卜</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0A0118;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 40px;
+    }
+
+    /* 神秘背景效果 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(148, 0, 211, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(75, 0, 130, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 星空背景 */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(186, 85, 211, 0.4), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(138, 43, 226, 0.3), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(147, 112, 219, 0.5), transparent);
+      background-size: 200% 200%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 导航栏 */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: linear-gradient(180deg, rgba(30, 10, 60, 0.95) 0%, rgba(20, 5, 40, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(186, 85, 211, 0.2);
+      box-shadow: 0 4px 24px rgba(138, 43, 226, 0.1);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .back-button {
+      color: #E0AAFF;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      color: #C77DFF;
+      transform: translateX(-4px);
+    }
+
+    .nav-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: #E0AAFF;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 16px;
+    }
+
+    .action-icon {
+      font-size: 20px;
+      color: #C77DFF;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .action-icon:hover {
+      color: #E0AAFF;
+      transform: scale(1.1);
+    }
+
+    .action-icon.important {
+      color: #FFB400;
+    }
+
+    /* 主内容 */
+    .container {
+      padding: 24px;
+    }
+
+    /* 基本信息卡片 */
+    .info-card {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.2) 0%, rgba(88, 28, 135, 0.15) 100%);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      border: 1.5px solid rgba(186, 85, 211, 0.3);
+    }
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #C77DFF;
+    }
+
+    .info-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .info-label {
+      color: #9D9DB8;
+    }
+
+    .info-value {
+      color: #E0AAFF;
+      font-weight: 600;
+    }
+
+    /* 问题卡片 */
+    .question-card {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+    }
+
+    .question-label {
+      font-size: 13px;
+      color: #9D9DB8;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .question-text {
+      font-size: 16px;
+      color: #E0AAFF;
+      line-height: 1.6;
+    }
+
+    /* 卡牌横向滚动 */
+    .cards-scroll-section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E0AAFF 0%, #C77DFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      position: relative;
+      padding-left: 14px;
+    }
+
+    .section-title::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 18px;
+      background: linear-gradient(180deg, #9D4EDD 0%, #7B2CBF 100%);
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(157, 78, 221, 0.6);
+    }
+
+    .cards-scroll {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 12px 0;
+      scrollbar-width: none;
+    }
+
+    .cards-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .card-item {
+      min-width: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-image {
+      width: 100px;
+      height: 150px;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 50%, #5A189A 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      border: 2px solid rgba(224, 170, 255, 0.3);
+      box-shadow: 0 8px 24px rgba(157, 78, 221, 0.4);
+    }
+
+    .card-name {
+      font-size: 14px;
+      color: #E0AAFF;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .card-status {
+      font-size: 12px;
+      color: #9D9DB8;
+    }
+
+    /* 解读内容 */
+    .interpretation-section {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      margin-bottom: 24px;
+    }
+
+    .interpretation-text {
+      font-size: 15px;
+      color: #D8B4FE;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    /* 综合分析 */
+    .analysis-section {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      margin-bottom: 24px;
+    }
+
+    .analysis-text {
+      font-size: 15px;
+      color: #D8B4FE;
+      line-height: 1.8;
+    }
+
+    /* 笔记区域 */
+    .notes-section {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      margin-bottom: 24px;
+    }
+
+    .notes-input {
+      width: 100%;
+      min-height: 120px;
+      padding: 16px;
+      background: rgba(20, 5, 40, 0.4);
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      border-radius: 12px;
+      color: #E0AAFF;
+      font-size: 14px;
+      font-family: inherit;
+      resize: vertical;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .notes-input::placeholder {
+      color: rgba(199, 125, 255, 0.4);
+    }
+
+    .notes-input:focus {
+      outline: none;
+      border-color: #9D4EDD;
+      box-shadow: 0 0 16px rgba(157, 78, 221, 0.3);
+    }
+
+    .notes-hint {
+      font-size: 13px;
+      color: #9D9DB8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* 标签区域 */
+    .tags-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      padding: 6px 14px;
+      background: rgba(157, 78, 221, 0.2);
+      border-radius: 16px;
+      font-size: 13px;
+      color: #C77DFF;
+      border: 1px solid rgba(186, 85, 211, 0.3);
+    }
+
+    /* 操作按钮 */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 24px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 100%);
+      color: #FFFFFF;
+      box-shadow: 0 8px 24px rgba(157, 78, 221, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(157, 78, 221, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1.5px solid rgba(186, 85, 211, 0.4);
+      color: #C77DFF;
+    }
+
+    .btn-secondary:hover {
+      border-color: #9D4EDD;
+      background: rgba(157, 78, 221, 0.1);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1.5px solid rgba(255, 107, 157, 0.4);
+      color: #FF6B9D;
+    }
+
+    .btn-danger:hover {
+      border-color: #FF6B9D;
+      background: rgba(255, 107, 157, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 导航栏 -->
+    <div class="navbar">
+      <div class="nav-left">
+        <span class="back-button">←</span>
+        <span class="nav-title">占卜详情</span>
+      </div>
+      <div class="nav-actions">
+        <span class="action-icon">📤</span>
+        <span class="action-icon">🗑️</span>
+        <span class="action-icon important">⭐</span>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+      <!-- 基本信息 -->
+      <div class="info-card">
+        <div class="info-row">
+          <span class="info-label">日期:</span>
+          <span class="info-value">2025-12-16 14:30</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">主题:</span>
+          <span class="info-value">事业占卜</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">牌阵:</span>
+          <span class="info-value">凯尔特十字</span>
+        </div>
+      </div>
+
+      <!-- 问题 -->
+      <div class="question-card">
+        <div class="question-label">你的问题</div>
+        <div class="question-text">我的事业发展如何？</div>
+      </div>
+
+      <!-- 抽到的牌 -->
+      <div class="cards-scroll-section">
+        <div class="section-title">抽到的牌</div>
+        <div class="cards-scroll">
+          <div class="card-item">
+            <div class="card-image">🃏</div>
+            <div class="card-name">愚者</div>
+            <div class="card-status">正位</div>
+          </div>
+          <div class="card-item">
+            <div class="card-image">🃏</div>
+            <div class="card-name">女祭司</div>
+            <div class="card-status">逆位</div>
+          </div>
+          <div class="card-item">
+            <div class="card-image">🃏</div>
+            <div class="card-name">皇帝</div>
+            <div class="card-status">正位</div>
+          </div>
+          <div class="card-item">
+            <div class="card-image">🃏</div>
+            <div class="card-name">恋人</div>
+            <div class="card-status">正位</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 解读内容 -->
+      <div class="interpretation-section">
+        <div class="section-title">解读内容</div>
+        <div class="interpretation-text">
+          从整体牌面来看，你的事业正处于一个重要的转折点。愚者代表着新的开始和冒险精神，这意味着你可能会面临一个全新的机会或挑战。女祭司逆位提醒你在做决策时需要更加相信自己的直觉，不要过度依赖理性分析。
+        </div>
+        <div class="interpretation-text">
+          皇帝的出现表明你需要更加果断和有条理地处理事务，建立明确的目标和计划。恋人则暗示你可能需要在事业发展中做出重要的选择，这个选择将影响你未来的方向。
+        </div>
+      </div>
+
+      <!-- 综合分析 -->
+      <div class="analysis-section">
+        <div class="section-title">综合分析</div>
+        <div class="analysis-text">
+          总体而言，你的事业发展前景是积极的，但需要你更加主动和果断。建议你：1) 保持开放的心态迎接新机会；2) 相信自己的判断；3) 制定清晰的行动计划；4) 在关键时刻做出明智的选择。记住，成功不仅需要努力，更需要智慧和勇气。
+        </div>
+      </div>
+
+      <!-- 我的笔记 -->
+      <div class="notes-section">
+        <div class="section-title">我的笔记</div>
+        <textarea
+          class="notes-input"
+          placeholder="记录你的想法和体会..."
+        >今天的占卜结果很有启发性。确实最近有一个新项目的机会，我一直在犹豫要不要接受。看来是时候做出决定了。</textarea>
+        <div class="notes-hint">💡 点击编辑保存你的想法</div>
+
+        <div class="tags-section">
+          <span class="tag">#重要</span>
+          <span class="tag">#事业转折点</span>
+          <span class="tag">#需要决策</span>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="action-buttons">
+        <button class="btn btn-secondary">分享记录</button>
+        <button class="btn btn-primary">保存笔记</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

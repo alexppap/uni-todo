@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>塔罗知识测试 - 学习中心</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0A0118;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 神秘背景效果 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(148, 0, 211, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(75, 0, 130, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 星空背景 */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(186, 85, 211, 0.4), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(138, 43, 226, 0.3), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(147, 112, 219, 0.5), transparent);
+      background-size: 200% 200%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 导航栏 */
+    .navbar {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      background: linear-gradient(180deg, rgba(30, 10, 60, 0.95) 0%, rgba(20, 5, 40, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(186, 85, 211, 0.2);
+      box-shadow: 0 4px 24px rgba(138, 43, 226, 0.1);
+    }
+
+    .back-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #E0AAFF;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      color: #C77DFF;
+      transform: translateX(-4px);
+    }
+
+    /* 进度条区域 */
+    .progress-section {
+      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-bottom: 1px solid rgba(186, 85, 211, 0.2);
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .progress-text {
+      font-size: 15px;
+      color: #C77DFF;
+      font-weight: 600;
+    }
+
+    .progress-percent {
+      font-size: 15px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E0AAFF 0%, #C77DFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(123, 44, 191, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(186, 85, 211, 0.2);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #9D4EDD 0%, #C77DFF 100%);
+      border-radius: 4px;
+      width: 30%;
+      transition: width 0.6s ease;
+      box-shadow: 0 0 12px rgba(157, 78, 221, 0.6);
+    }
+
+    /* 主内容 */
+    .container {
+      padding: 32px 24px;
+      min-height: calc(100vh - 200px);
+    }
+
+    /* 卡牌图片 */
+    .card-image-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+
+    .card-image {
+      width: 200px;
+      height: 300px;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 50%, #5A189A 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 100px;
+      box-shadow:
+        0 20px 60px rgba(157, 78, 221, 0.6),
+        0 0 100px rgba(138, 43, 226, 0.3),
+        inset 0 2px 0 rgba(224, 170, 255, 0.2);
+      border: 3px solid rgba(224, 170, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-image::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(224, 170, 255, 0.15), transparent);
+      transform: rotate(45deg);
+    }
+
+    /* 问题 */
+    .question-section {
+      margin-bottom: 32px;
+    }
+
+    .question-text {
+      font-size: 22px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E0AAFF 0%, #C77DFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* 选项列表 */
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-item {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border: 2px solid rgba(186, 85, 211, 0.3);
+      border-radius: 16px;
+      padding: 20px 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(224, 170, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .option-item:hover::before {
+      left: 100%;
+    }
+
+    .option-item:hover {
+      border-color: #9D4EDD;
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.2) 0%, rgba(123, 44, 191, 0.15) 100%);
+      transform: translateX(6px);
+    }
+
+    .option-item.selected {
+      border-color: #9D4EDD;
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.3) 0%, rgba(123, 44, 191, 0.2) 100%);
+      box-shadow: 0 8px 24px rgba(157, 78, 221, 0.3);
+    }
+
+    .option-item.correct {
+      border-color: #4CAF50;
+      background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(56, 142, 60, 0.15) 100%);
+    }
+
+    .option-item.wrong {
+      border-color: #FF6B9D;
+      background: linear-gradient(135deg, rgba(255, 107, 157, 0.2) 0%, rgba(255, 87, 137, 0.15) 100%);
+    }
+
+    .option-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .option-letter {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: #FFFFFF;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(157, 78, 221, 0.4);
+    }
+
+    .option-item.correct .option-letter {
+      background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+    }
+
+    .option-item.wrong .option-letter {
+      background: linear-gradient(135deg, #FF6B9D 0%, #FF5789 100%);
+    }
+
+    .option-text {
+      flex: 1;
+      font-size: 16px;
+      color: #E0AAFF;
+      font-weight: 500;
+    }
+
+    /* 提示框 */
+    .hint-box {
+      margin-top: 24px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.15) 0%, rgba(123, 44, 191, 0.1) 100%);
+      border-radius: 16px;
+      border: 1.5px solid rgba(186, 85, 211, 0.3);
+      display: none;
+    }
+
+    .hint-box.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hint-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #C77DFF;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hint-text {
+      font-size: 14px;
+      color: #D8B4FE;
+      line-height: 1.6;
+    }
+
+    /* 下一题按钮 */
+    .next-button {
+      width: 100%;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 100%);
+      border: none;
+      border-radius: 16px;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(157, 78, 221, 0.4);
+      margin-top: 32px;
+    }
+
+    .next-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(157, 78, 221, 0.5);
+    }
+
+    .next-button:active {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 导航栏 -->
+    <div class="navbar">
+      <div class="back-button">
+        <span>←</span>
+        <span>塔罗知识测试</span>
+      </div>
+    </div>
+
+    <!-- 进度区域 -->
+    <div class="progress-section">
+      <div class="progress-info">
+        <span class="progress-text">题目 3 / 10</span>
+        <span class="progress-percent">30%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+      <!-- 卡牌图片 -->
+      <div class="card-image-section">
+        <div class="card-image">🃏</div>
+      </div>
+
+      <!-- 问题 -->
+      <div class="question-section">
+        <div class="question-text">这张牌是？</div>
+      </div>
+
+      <!-- 选项列表 -->
+      <div class="options-list">
+        <div class="option-item">
+          <div class="option-content">
+            <div class="option-letter">A</div>
+            <div class="option-text">愚者 (The Fool)</div>
+          </div>
+        </div>
+
+        <div class="option-item selected">
+          <div class="option-content">
+            <div class="option-letter">B</div>
+            <div class="option-text">魔术师 (The Magician)</div>
+          </div>
+        </div>
+
+        <div class="option-item">
+          <div class="option-content">
+            <div class="option-letter">C</div>
+            <div class="option-text">女祭司 (The High Priestess)</div>
+          </div>
+        </div>
+
+        <div class="option-item">
+          <div class="option-content">
+            <div class="option-letter">D</div>
+            <div class="option-text">女皇 (The Empress)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 提示框（答题后显示） -->
+      <div class="hint-box">
+        <div class="hint-title">
+          <span>💡</span>
+          <span>解析</span>
+        </div>
+        <div class="hint-text">
+          愚者是塔罗牌中的第0张牌，代表新的开始和无限的可能性。牌面上通常描绘一个年轻人站在悬崖边，准备踏上未知的旅程。
+        </div>
+      </div>
+
+      <!-- 下一题按钮 -->
+      <button class="next-button">下一题 →</button>
+    </div>
+  </div>
+</body>
+</html>

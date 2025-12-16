@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>占卜记录 - 塔罗占卜</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0A0118;
+      position: relative;
+      min-height: 100vh;
+      padding-bottom: 70px;
+      overflow-x: hidden;
+    }
+
+    /* 神秘背景效果 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(148, 0, 211, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(75, 0, 130, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 星空背景 */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(186, 85, 211, 0.4), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(138, 43, 226, 0.3), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(147, 112, 219, 0.5), transparent);
+      background-size: 200% 200%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 头部区域 */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: linear-gradient(180deg, rgba(30, 10, 60, 0.95) 0%, rgba(20, 5, 40, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(186, 85, 211, 0.2);
+      box-shadow: 0 4px 24px rgba(138, 43, 226, 0.1);
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #E0AAFF 0%, #C77DFF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .filter-icon {
+      font-size: 22px;
+      color: #C77DFF;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-icon:hover {
+      color: #E0AAFF;
+      transform: scale(1.1);
+    }
+
+    /* 主内容区 */
+    .container {
+      padding: 24px;
+    }
+
+    /* 分类筛选 */
+    .filter-section {
+      margin-bottom: 24px;
+    }
+
+    .filter-tags {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0;
+      scrollbar-width: none;
+    }
+
+    .filter-tags::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-tag {
+      padding: 8px 18px;
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.2) 0%, rgba(88, 28, 135, 0.15) 100%);
+      border: 1.5px solid rgba(186, 85, 211, 0.3);
+      border-radius: 20px;
+      color: #C77DFF;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .filter-tag:hover {
+      border-color: #9D4EDD;
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.3) 0%, rgba(123, 44, 191, 0.2) 100%);
+      transform: translateY(-2px);
+    }
+
+    .filter-tag.active {
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 100%);
+      border-color: #9D4EDD;
+      color: #FFFFFF;
+      box-shadow: 0 4px 16px rgba(157, 78, 221, 0.4);
+    }
+
+    /* 记录列表 */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .history-item {
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .history-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(224, 170, 255, 0.1), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .history-item:hover::before {
+      left: 100%;
+    }
+
+    .history-item:hover {
+      transform: translateY(-4px);
+      border-color: #9D4EDD;
+      box-shadow:
+        0 12px 32px rgba(157, 78, 221, 0.3),
+        0 0 40px rgba(138, 43, 226, 0.2);
+    }
+
+    /* 记录头部 */
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .history-meta {
+      flex: 1;
+    }
+
+    .history-date {
+      font-size: 15px;
+      color: #C77DFF;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .important-badge {
+      font-size: 14px;
+      color: #FFB400;
+    }
+
+    .history-category {
+      font-size: 13px;
+      color: #9D9DB8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-dot {
+      width: 4px;
+      height: 4px;
+      background: #9D9DB8;
+      border-radius: 50%;
+    }
+
+    /* 问题文本 */
+    .history-question {
+      font-size: 15px;
+      color: #E0AAFF;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* 卡牌预览 */
+    .cards-preview {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0;
+      scrollbar-width: none;
+    }
+
+    .cards-preview::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mini-card {
+      min-width: 50px;
+      width: 50px;
+      height: 75px;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 50%, #5A189A 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 1.5px solid rgba(224, 170, 255, 0.3);
+      box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
+    }
+
+    /* 空状态 */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #C77DFF;
+      margin-bottom: 12px;
+    }
+
+    .empty-text {
+      font-size: 15px;
+      color: #9D9DB8;
+      line-height: 1.6;
+    }
+
+    .empty-action {
+      margin-top: 24px;
+      padding: 12px 32px;
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 100%);
+      border: none;
+      border-radius: 16px;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 24px rgba(157, 78, 221, 0.4);
+    }
+
+    .empty-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(157, 78, 221, 0.5);
+    }
+
+    /* 底部导航栏 */
+    .tabbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      background: linear-gradient(180deg, rgba(20, 5, 40, 0.95) 0%, rgba(15, 3, 30, 0.98) 100%);
+      backdrop-filter: blur(20px);
+      border-top: 1.5px solid rgba(186, 85, 211, 0.2);
+      height: 70px;
+      padding: 0;
+      box-shadow: 0 -4px 24px rgba(138, 43, 226, 0.15);
+      z-index: 100;
+    }
+
+    .tabbar-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      color: #9D9DB8;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tabbar-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #9D4EDD 0%, #C77DFF 100%);
+      border-radius: 0 0 3px 3px;
+      transition: width 0.3s ease;
+      box-shadow: 0 2px 12px rgba(157, 78, 221, 0.6);
+    }
+
+    .tabbar-item.active::before {
+      width: 60%;
+    }
+
+    .tabbar-item.active {
+      color: #E0AAFF;
+    }
+
+    .tabbar-icon {
+      font-size: 26px;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 8px rgba(157, 78, 221, 0.2));
+    }
+
+    .tabbar-item.active .tabbar-icon {
+      transform: scale(1.1);
+      filter: drop-shadow(0 4px 12px rgba(157, 78, 221, 0.5));
+    }
+
+    .tabbar-text {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 头部 -->
+    <div class="header">
+      <div class="title">占卜记录</div>
+      <div class="filter-icon">⚙️</div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+      <!-- 分类筛选 -->
+      <div class="filter-section">
+        <div class="filter-tags">
+          <div class="filter-tag active">全部</div>
+          <div class="filter-tag">爱情</div>
+          <div class="filter-tag">事业</div>
+          <div class="filter-tag">学业</div>
+          <div class="filter-tag">财运</div>
+          <div class="filter-tag">健康</div>
+        </div>
+      </div>
+
+      <!-- 记录列表 -->
+      <div class="history-list">
+        <!-- 记录1 -->
+        <div class="history-item">
+          <div class="history-header">
+            <div class="history-meta">
+              <div class="history-date">
+                2025-12-16 14:30
+                <span class="important-badge">⭐</span>
+              </div>
+              <div class="history-category">
+                事业
+                <span class="category-dot"></span>
+                凯尔特十字
+              </div>
+            </div>
+          </div>
+          <div class="history-question">
+            问题: 我的事业发展如何？
+          </div>
+          <div class="cards-preview">
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+          </div>
+        </div>
+
+        <!-- 记录2 -->
+        <div class="history-item">
+          <div class="history-header">
+            <div class="history-meta">
+              <div class="history-date">
+                2025-12-15 09:15
+              </div>
+              <div class="history-category">
+                爱情
+                <span class="category-dot"></span>
+                时间三角
+              </div>
+            </div>
+          </div>
+          <div class="history-question">
+            每日一抽
+          </div>
+          <div class="cards-preview">
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+          </div>
+        </div>
+
+        <!-- 记录3 -->
+        <div class="history-item">
+          <div class="history-header">
+            <div class="history-meta">
+              <div class="history-date">
+                2025-12-14 20:45
+                <span class="important-badge">⭐</span>
+              </div>
+              <div class="history-category">
+                学业
+                <span class="category-dot"></span>
+                爱情牌阵
+              </div>
+            </div>
+          </div>
+          <div class="history-question">
+            问题: 考试能否顺利通过？
+          </div>
+          <div class="cards-preview">
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+            <div class="mini-card">🃏</div>
+          </div>
+        </div>
+
+        <!-- 记录4 -->
+        <div class="history-item">
+          <div class="history-header">
+            <div class="history-meta">
+              <div class="history-date">
+                2025-12-13 16:20
+              </div>
+              <div class="history-category">
+                通用
+                <span class="category-dot"></span>
+                单张抽牌
+              </div>
+            </div>
+          </div>
+          <div class="history-question">
+            问题: 今天的运势如何？
+          </div>
+          <div class="cards-preview">
+            <div class="mini-card">🃏</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部导航栏 -->
+    <div class="tabbar">
+      <div class="tabbar-item">
+        <div class="tabbar-icon">🏠</div>
+        <div class="tabbar-text">首页</div>
+      </div>
+      <div class="tabbar-item">
+        <div class="tabbar-icon">🎴</div>
+        <div class="tabbar-text">牌库</div>
+      </div>
+      <div class="tabbar-item active">
+        <div class="tabbar-icon">📜</div>
+        <div class="tabbar-text">历史</div>
+      </div>
+      <div class="tabbar-item">
+        <div class="tabbar-icon">📚</div>
+        <div class="tabbar-text">学习</div>
+      </div>
+      <div class="tabbar-item">
+        <div class="tabbar-icon">👤</div>
+        <div class="tabbar-text">我的</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

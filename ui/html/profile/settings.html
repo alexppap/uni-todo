@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>设置 - 塔罗占卜</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0A0118;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 40px;
+    }
+
+    /* 神秘背景效果 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(148, 0, 211, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(75, 0, 130, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 星空背景 */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image:
+        radial-gradient(2px 2px at 20% 30%, rgba(186, 85, 211, 0.4), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(138, 43, 226, 0.3), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(147, 112, 219, 0.5), transparent);
+      background-size: 200% 200%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 导航栏 */
+    .navbar {
+      display: flex;
+      align-items: center;
+      padding: 16px 24px;
+      background: linear-gradient(180deg, rgba(30, 10, 60, 0.95) 0%, rgba(20, 5, 40, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(186, 85, 211, 0.2);
+      box-shadow: 0 4px 24px rgba(138, 43, 226, 0.1);
+    }
+
+    .back-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #E0AAFF;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .back-button:hover {
+      color: #C77DFF;
+      transform: translateX(-4px);
+    }
+
+    /* 主内容 */
+    .container {
+      padding: 24px;
+    }
+
+    /* 章节 */
+    .section {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      color: #9D9DB8;
+      margin-bottom: 12px;
+      padding-left: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .section-items {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: linear-gradient(135deg, rgba(123, 44, 191, 0.15) 0%, rgba(88, 28, 135, 0.1) 100%);
+      border-radius: 16px;
+      padding: 4px;
+      border: 1.5px solid rgba(186, 85, 211, 0.2);
+    }
+
+    /* 设置项 */
+    .setting-item {
+      background: rgba(10, 1, 24, 0.5);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-radius: 12px;
+    }
+
+    .setting-item:hover {
+      background: rgba(157, 78, 221, 0.1);
+    }
+
+    .setting-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .setting-icon {
+      font-size: 20px;
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, rgba(157, 78, 221, 0.3) 0%, rgba(123, 44, 191, 0.2) 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(186, 85, 211, 0.3);
+      flex-shrink: 0;
+    }
+
+    .setting-text {
+      font-size: 15px;
+      color: #E0AAFF;
+      font-weight: 500;
+    }
+
+    .setting-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .setting-value {
+      font-size: 14px;
+      color: #9D9DB8;
+    }
+
+    .setting-arrow {
+      font-size: 16px;
+      color: #C77DFF;
+    }
+
+    /* 开关 */
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      background: rgba(123, 44, 191, 0.3);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1.5px solid rgba(186, 85, 211, 0.4);
+    }
+
+    .switch.active {
+      background: linear-gradient(135deg, #9D4EDD 0%, #7B2CBF 100%);
+      border-color: #9D4EDD;
+      box-shadow: 0 0 16px rgba(157, 78, 221, 0.5);
+    }
+
+    .switch-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 22px;
+      height: 22px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .switch.active .switch-knob {
+      left: 22px;
+    }
+
+    /* 分隔线 */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(186, 85, 211, 0.3), transparent);
+      margin: 24px 0;
+    }
+
+    /* 危险操作 */
+    .danger-section {
+      margin-top: 40px;
+    }
+
+    .danger-button {
+      width: 100%;
+      padding: 14px 24px;
+      background: transparent;
+      border: 1.5px solid rgba(255, 107, 157, 0.4);
+      border-radius: 16px;
+      color: #FF6B9D;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .danger-button:hover {
+      border-color: #FF6B9D;
+      background: rgba(255, 107, 157, 0.1);
+    }
+
+    /* 版本信息 */
+    .version-info {
+      text-align: center;
+      margin-top: 32px;
+      padding: 16px;
+    }
+
+    .version-text {
+      font-size: 13px;
+      color: #9D9DB8;
+      line-height: 1.6;
+    }
+
+    .version-number {
+      color: #C77DFF;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 导航栏 -->
+    <div class="navbar">
+      <div class="back-button">
+        <span>←</span>
+        <span>设置</span>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="container">
+      <!-- 个人信息 -->
+      <div class="section">
+        <div class="section-title">个人信息</div>
+        <div class="section-items">
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">✏️</div>
+              <div class="setting-text">修改昵称</div>
+            </div>
+            <div class="setting-right">
+              <div class="setting-value">塔罗探索者</div>
+              <div class="setting-arrow">→</div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">🖼️</div>
+              <div class="setting-text">修改头像</div>
+            </div>
+            <div class="setting-right">
+              <div class="setting-arrow">→</div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">🎂</div>
+              <div class="setting-text">生日设置</div>
+            </div>
+            <div class="setting-right">
+              <div class="setting-value">1990-06-15</div>
+              <div class="setting-arrow">→</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 占卜设置 -->
+      <div class="section">
+        <div class="section-title">占卜设置</div>
+        <div class="section-items">
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">🔊</div>
+              <div class="setting-text">音效开关</div>
+            </div>
+            <div class="setting-right">
+              <div class="switch active">
+                <div class="switch-knob"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">📳</div>
+              <div class="setting-text">震动反馈</div>
+            </div>
+            <div class="setting-right">
+              <div class="switch active">
+                <div class="switch-knob"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">⏰</div>
+              <div class="setting-text">每日提醒</div>
+            </div>
+            <div class="setting-right">
+              <div class="switch">
+                <div class="switch-knob"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 外观 -->
+      <div class="section">
+        <div class="section-title">外观</div>
+        <div class="section-items">
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">🌙</div>
+              <div class="setting-text">深色模式</div>
+            </div>
+            <div class="setting-right">
+              <div class="switch active">
+                <div class="switch-knob"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 其他 -->
+      <div class="section">
+        <div class="section-title">其他</div>
+        <div class="section-items">
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">🗑️</div>
+              <div class="setting-text">清除缓存</div>
+            </div>
+            <div class="setting-right">
+              <div class="setting-value">12.5 MB</div>
+              <div class="setting-arrow">→</div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">🔒</div>
+              <div class="setting-text">隐私政策</div>
+            </div>
+            <div class="setting-right">
+              <div class="setting-arrow">→</div>
+            </div>
+          </div>
+
+          <div class="setting-item">
+            <div class="setting-left">
+              <div class="setting-icon">ℹ️</div>
+              <div class="setting-text">关于我们</div>
+            </div>
+            <div class="setting-right">
+              <div class="setting-arrow">→</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- 危险操作 -->
+      <div class="danger-section">
+        <button class="danger-button">退出登录</button>
+      </div>
+
+      <!-- 版本信息 -->
+      <div class="version-info">
+        <div class="version-text">
+          塔罗占卜 <span class="version-number">v1.0.0</span>
+        </div>
+        <div class="version-text">
+          © 2025 Tarot Divination
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
