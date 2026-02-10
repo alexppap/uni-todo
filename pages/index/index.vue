@@ -1,39 +1,27 @@
 <template>
 	<view class="page">
-		<!-- 自定义导航栏 -->
-		<view class="nav-bar" :style="{ paddingTop: statusBarHeight + 'px' }">
-			<view class="nav-bar-inner">
-				<view class="nav-btn" @click="goBack">
-					<text class="nav-icon">&lt;</text>
-				</view>
-				<text class="nav-title">一船一成本</text>
-				<view class="nav-btn" @click="closePage">
-					<text class="nav-icon close-icon">×</text>
-				</view>
-			</view>
-		</view>
-
-		<!-- 占位，避免内容被导航栏遮挡 -->
-		<view :style="{ height: (statusBarHeight + 44) + 'px' }"></view>
+		<!-- 顶部安全区占位 -->
+		<view :style="{ height: statusBarHeight + 'px' }"></view>
 
 		<!-- 顶部 Banner -->
 		<view class="banner">
 			<view class="banner-content">
 				<text class="banner-title">工业智脑</text>
-				<!-- 船舶装饰图（使用 CSS 绘制简化版） -->
-				<view class="banner-decoration">
-					<view class="deco-line deco-line-1"></view>
-					<view class="deco-line deco-line-2"></view>
-					<view class="deco-line deco-line-3"></view>
-				</view>
+			</view>
+			<!-- 装饰：流线型弧线 -->
+			<view class="banner-deco">
+				<view class="deco-arc deco-arc-1"></view>
+				<view class="deco-arc deco-arc-2"></view>
+				<view class="deco-arc deco-arc-3"></view>
+				<view class="deco-arc deco-arc-4"></view>
+				<view class="deco-arc deco-arc-5"></view>
 			</view>
 		</view>
 
 		<!-- 功能入口卡片 -->
 		<view class="card-wrapper">
 			<view class="entry-card" @click="goToOverview">
-				<view class="card-bg-fallback"></view>
-				<image class="card-bg" src="/static/ship-entry.png" mode="aspectFill" @error="imgError = true"></image>
+				<image class="card-bg" src="/static/ship-entry.png" mode="aspectFill"></image>
 				<view class="card-overlay"></view>
 				<view class="card-content">
 					<text class="card-title">一船一成本</text>
@@ -51,25 +39,11 @@
 	import { onLoad } from '@dcloudio/uni-app'
 
 	const statusBarHeight = ref(0)
-	const imgError = ref(false)
 
 	onLoad(() => {
 		const sysInfo = uni.getSystemInfoSync()
 		statusBarHeight.value = sysInfo.statusBarHeight || 0
 	})
-
-	const goBack = () => {
-		uni.navigateBack({
-			fail: () => {}
-		})
-	}
-
-	const closePage = () => {
-		uni.navigateBack({
-			delta: 99,
-			fail: () => {}
-		})
-	}
 
 	const goToOverview = () => {
 		uni.switchTab({
@@ -84,53 +58,10 @@
 		background-color: #F5F6FA;
 	}
 
-	/* 自定义导航栏 */
-	.nav-bar {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 100;
-		background-color: #FFFFFF;
-	}
-
-	.nav-bar-inner {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
-		height: 44px;
-		padding: 0 16rpx;
-	}
-
-	.nav-btn {
-		width: 80rpx;
-		height: 44px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.nav-icon {
-		font-size: 40rpx;
-		color: #333333;
-		font-weight: 300;
-	}
-
-	.close-icon {
-		font-size: 44rpx;
-	}
-
-	.nav-title {
-		font-size: 34rpx;
-		font-weight: 600;
-		color: #333333;
-	}
-
 	/* Banner */
 	.banner {
 		background: linear-gradient(135deg, #2979FF, #4B9AFF);
-		padding: 40rpx 32rpx 80rpx;
+		padding: 40rpx 32rpx 40rpx;
 		position: relative;
 		overflow: hidden;
 	}
@@ -152,7 +83,7 @@
 		right: -20rpx;
 		top: -20rpx;
 		width: 300rpx;
-		height: 200rpx;
+		height: 100rpx;
 	}
 
 	.deco-line {
@@ -186,7 +117,7 @@
 	/* 功能入口卡片 */
 	.card-wrapper {
 		padding: 0 32rpx;
-		margin-top: -40rpx;
+		margin-top: 20rpx;
 		position: relative;
 		z-index: 3;
 	}

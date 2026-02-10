@@ -10,12 +10,14 @@
 		{
 			"path": "pages/overview/index",
 			"style": {
+				"navigationStyle": "custom",
 				"navigationBarTitleText": "一船一成本"
 			}
 		},
 		{
 			"path": "pages/ship/index",
 			"style": {
+				"navigationStyle": "custom",
 				"navigationBarTitleText": "船舶"
 			}
 		},
@@ -34,6 +36,7 @@
 		{
 			"path": "pages/mine/index",
 			"style": {
+				"navigationStyle": "custom",
 				"navigationBarTitleText": "我的"
 			}
 		}
