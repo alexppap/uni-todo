@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(copy \"D:\\\\project\\\\uni-todo\\\\static\\\\home.png\" \"D:\\\\project\\\\uni-todo\\\\static\\\\tab\\\\home.png\")",
+      "Bash(copy \"D:\\\\project\\\\uni-todo\\\\static\\\\home-active.png\" \"D:\\\\project\\\\uni-todo\\\\static\\\\tab\\\\home-active.png\")",
+      "Bash(copy \"D:\\\\project\\\\uni-todo\\\\static\\\\nav.png\" \"D:\\\\project\\\\uni-todo\\\\static\\\\tab\\\\ship.png\")",
+      "Bash(copy \"D:\\\\project\\\\uni-todo\\\\static\\\\nav.png\" \"D:\\\\project\\\\uni-todo\\\\static\\\\tab\\\\ship-active.png\")",
+      "Bash(copy \"D:\\\\project\\\\uni-todo\\\\static\\\\star.png\" \"D:\\\\project\\\\uni-todo\\\\static\\\\tab\\\\mine.png\")",
+      "Bash(copy \"D:\\\\project\\\\uni-todo\\\\static\\\\star-active.png\" \"D:\\\\project\\\\uni-todo\\\\static\\\\tab\\\\mine-active.png\")"
+    ]
+  }
+}
